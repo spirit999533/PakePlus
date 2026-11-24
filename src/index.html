@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AVA 战地之王 · 模式与地图全表（离线版）</title>
+<style>
+  :root{
+    --bg:#f4f1ea;
+    --paper:#fffdf8;
+    --ink:#1c1b19;
+    --ink-2:#4a463f;
+    --ink-3:#7d7669;
+    --line:#d9d2c3;
+    --line-2:#e9e3d6;
+    --accent:#8c2f1f;
+    --accent-2:#b8452c;
+    --tag-off:#1f5c3d;
+    --tag-lit:#7a5a12;
+    --tag-unk:#6b6560;
+    --band:#22201d;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    font-size:15px;
+    line-height:1.7;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px 90px}
+
+  header.band{
+    background:var(--band);
+    color:#f2eee4;
+    padding:38px 0 30px;
+    border-bottom:3px solid var(--accent);
+  }
+  header.band .wrap{padding-bottom:0}
+  .kicker{
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:#b6ada0;margin:0 0 12px;
+  }
+  h1{
+    margin:0 0 10px;font-size:30px;line-height:1.25;font-weight:800;
+    letter-spacing:-.01em;font-family:"Noto Serif SC","Songti SC",Georgia,serif;
+  }
+  h1 span{color:#d8c7b4;font-weight:500;font-size:17px;display:block;margin-top:8px;letter-spacing:.02em}
+  .band-meta{font-size:12.5px;color:#9c9487;margin-top:16px;letter-spacing:.03em}
+
+  /* ---- 顶部工具条 ---- */
+  .toolbar{
+    position:sticky;top:0;z-index:20;
+    background:rgba(244,241,234,.94);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:11px 0;
+    margin-bottom:26px;
+  }
+  .toolbar .wrap{padding-bottom:0;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .search{
+    flex:1 1 260px;display:flex;align-items:center;gap:8px;
+    background:var(--paper);border:1px solid var(--line);border-radius:999px;
+    padding:0 14px;height:38px;
+  }
+  .search input{
+    border:0;outline:0;background:transparent;flex:1;font-size:14px;
+    color:var(--ink);font-family:inherit;min-width:0;
+  }
+  .search input::placeholder{color:var(--ink-3)}
+  .search .ico{color:var(--ink-3);font-size:14px}
+  .chk{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:13px;color:var(--ink-2);cursor:pointer;user-select:none;
+    background:var(--paper);border:1px solid var(--line);border-radius:999px;
+    padding:0 13px;height:38px;white-space:nowrap;
+  }
+  .chk input{accent-color:var(--accent);margin:0}
+  .count{
+    font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  /* ---- 说明卡 ---- */
+  .notes{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:14px;margin:0 0 34px;
+  }
+  .note{
+    background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--accent);
+    padding:14px 16px 12px;border-radius:3px;
+  }
+  .note h3{margin:0 0 6px;font-size:13px;letter-spacing:.06em;color:var(--accent);font-weight:700}
+  .note p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.65}
+
+  /* ---- 章节 ---- */
+  section{margin:0 0 42px}
+  .sec-head{
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    border-bottom:2px solid var(--ink);padding-bottom:7px;margin-bottom:4px;
+  }
+  .sec-head h2{
+    margin:0;font-size:19px;font-weight:800;letter-spacing:.01em;
+    font-family:"Noto Serif SC","Songti SC",Georgia,serif;
+  }
+  .sec-head .en{
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+  }
+  .sec-head .n{
+    margin-left:auto;font-size:11.5px;color:var(--ink-3);
+    font-variant-numeric:tabular-nums;
+  }
+  .sec-note{font-size:13px;color:var(--ink-3);margin:9px 0 12px;line-height:1.6}
+
+  table{width:100%;border-collapse:collapse;background:var(--paper);font-size:14px}
+  thead th{
+    text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--line);
+    background:#efeade;
+  }
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  tbody tr:last-child td{border-bottom:1px solid var(--line)}
+  tr:hover td{background:#faf6ec}
+  .en-name{
+    font-family:ui-monospace,"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:13.5px;letter-spacing:-.01em;color:var(--ink);
+  }
+  .cn-name{color:var(--ink);font-weight:600}
+  .desc{color:var(--ink-2);font-size:13px}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  mark{
+    display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+    padding:1px 6px;border-radius:2px;vertical-align:1px;margin-right:6px;
+    border:1px solid currentColor;
+  }
+  mark.off{color:var(--tag-off);background:#eef5f0}
+  mark.lit{color:var(--tag-lit);background:#faf3e2}
+  mark.unk{color:var(--tag-unk);background:#f1efec}
+
+  tbody tr[data-mark="literal"] .cn-name{font-weight:500;color:var(--ink-2)}
+  tbody tr[data-mark="unknown"] .cn-name{font-weight:400;color:var(--ink-3)}
+
+  /* ---- callout ---- */
+  .callout{
+    background:#fff9ec;border:1px solid #e3d4b0;border-radius:3px;
+    padding:16px 18px;margin:18px 0 0;
+  }
+  .callout .t{font-size:12px;letter-spacing:.1em;color:#8a6a1c;font-weight:700;text-transform:uppercase;margin-bottom:8px}
+  .callout p{margin:0 0 8px;font-size:14px;color:#4a3f24;line-height:1.7}
+  .callout p:last-child{margin-bottom:0}
+  .kbd{
+    font-family:ui-monospace,Consolas,monospace;font-size:12.5px;
+    background:#fff;border:1px solid #d9c9a3;border-bottom-width:2px;border-radius:3px;
+    padding:1px 6px;color:#3b3220;
+  }
+
+  /* ---- 命令块 ---- */
+  .cmd{
+    position:relative;background:#22201d;color:#e8e2d4;border-radius:4px;
+    padding:18px 18px 18px;margin:14px 0 0;overflow:auto;
+  }
+  .cmd pre{
+    margin:0;font-family:ui-monospace,Consolas,"Liberation Mono",monospace;
+    font-size:13.5px;line-height:1.85;white-space:pre;
+  }
+  .cmd .cmt{color:#8e8672}
+  .cmd button{
+    position:absolute;top:10px;right:10px;
+    background:#3a3630;color:#d8d1c1;border:1px solid #4d4740;border-radius:3px;
+    font-size:11px;padding:4px 9px;cursor:pointer;font-family:inherit;letter-spacing:.05em;
+  }
+  .cmd button:hover{background:#4a453d;color:#fff}
+
+  /* ---- 来源 ---- */
+  footer{border-top:2px solid var(--ink);padding-top:16px;margin-top:10px}
+  footer h2{font-size:15px;margin:0 0 10px;font-weight:800}
+  footer ul{margin:0;padding-left:20px;font-size:12.5px;color:var(--ink-2)}
+  footer li{margin:0 0 6px;line-height:1.6;word-break:break-all}
+  footer li a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(140,47,31,.3)}
+  footer li a:hover{color:var(--accent-2)}
+  .foot-note{font-size:12px;color:var(--ink-3);margin-top:16px;line-height:1.7}
+
+  .empty{
+    display:none;text-align:center;color:var(--ink-3);font-size:14px;
+    padding:34px 0;border:1px dashed var(--line);
+    background:var(--paper);border-radius:3px;
+  }
+
+  @media (max-width:640px){
+    h1{font-size:23px}
+    h1 span{font-size:14px}
+    .wrap{padding:0 14px 60px}
+    thead th:nth-child(3),tbody td.desc-cell{display:none}
+    table{font-size:13.5px}
+    .sec-head h2{font-size:17px}
+  }
+  @media print{
+    .toolbar,.cmd button{display:none}
+    body{background:#fff;font-size:11.5pt}
+    .wrap{max-width:none;padding:0}
+    section{break-inside:auto;margin-bottom:18px}
+    tr{break-inside:avoid}
+    thead{display:table-header-group}
+    header.band{background:#22201d;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    table{font-size:10pt}
+    tbody td{padding:5px 8px}
+  }
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <p class="kicker">Alliance of Valiant Arms · Reference Sheet</p>
+    <h1>AVA 战地之王 · 模式与地图全表 · QQ群：283238605 QQ：1052200420
+      <span>13 种游戏模式 / 100+ 张地图 · 中英对照 · 离线查阅版</span>
+    </h1>
+    <div class="band-meta">整理日期 2026-11-24 &nbsp;|&nbsp; 数据源：日服 WIKIWIKI 官方地图库 · UAVA Wiki · AVA Global · 台服 / 国服公告</div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="wrap">
+    <div class="search">
+      <span class="ico">⌕</span>
+      <input id="q" type="search" placeholder="搜索地图名 / 中文名 / 模式（如 Cannon、猎狐、歼灭）" autocomplete="off">
+    </div>
+    <label class="chk"><input id="onlyOff" type="checkbox"> 只看有官方中文名的</label>
+    <span class="count" id="count"></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="notes">
+    <div class="note">
+      <h3>中文名的三个档位</h3>
+      <p><mark class="off">官方</mark>国服确用过的名字<br>
+         <mark class="lit">直译</mark>国服未引进或叫法不统一，按字面译<br>
+         <mark class="unk">待核</mark>没有可靠中文名，别当真名用</p>
+    </div>
+    <div class="note">
+      <h3>为什么数量对不上</h3>
+      <p>英文名取自日服／韩服最全的官方列表；国服只上线过其中一部分，台服另有自己的活动图。同一个英文名，各服中文叫法不保证一致。</p>
+    </div>
+    <div class="note">
+      <h3>你那个单机包只会更少</h3>
+      <p>1337 整合包通常只放几十张图，还可能混进私服自制图（后缀 <span class="kbd">_LB</span>、<span class="kbd">_Test</span>）。实际清单以本机目录为准。</p>
+    </div>
+  </div>
+
+  <!-- ===== 一、模式总表 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>一、模式总表</h2>
+      <span class="en">Game Modes</span>
+      <span class="n" data-count></span>
+    </div>
+    <p class="sec-note">人数为常规／上限值，私服可在建房时自行放宽；<span class="kbd">AI Mission</span> 与 <span class="kbd">Riot</span> 的人数是硬性锁定，不可随意改。</p>
+    <table>
+      <thead>
+        <tr><th style="width:26%">英文名</th><th style="width:22%">中文名</th><th>玩法与胜负条件</th><th style="width:15%">常规人数</th></tr>
+      </thead>
+      <tbody>
+        <tr data-mark="official"><td class="en-name">Annihilation</td><td class="cn-name"><mark class="off">官方</mark>歼灭 / 团队竞技</td><td class="desc">团队死斗。击杀 +1 分，尸体掉落军牌可捡；集满 3 枚军牌额外 +1 分。限时先到分数者胜。</td><td class="num">最多 16（8v8）</td></tr>
+        <tr data-mark="official"><td class="en-name">Demolition</td><td class="cn-name"><mark class="off">官方</mark>爆破</td><td class="desc">EU 进攻方装 C4 并守住 40 秒；NRF 防守方拆包或全歼。回合内不复活，死人出局。</td><td class="num">常见 5v5<br>（4v4–8v8）</td></tr>
+        <tr data-mark="official"><td class="en-name">Escort</td><td class="cn-name"><mark class="off">官方</mark>护送（战车）</td><td class="desc">EU 把坦克推到终点；NRF 从箱子里拿 RPG 打瘫坦克，EU 需两人修理。15 分钟一回合，攻守互换。</td><td class="num">8v8</td></tr>
+        <tr data-mark="literal"><td class="en-name">Breach</td><td class="cn-name"><mark class="lit">直译</mark>突破</td><td class="desc">AVA Global 对护送模式的改名，规则与 Escort 完全一致。</td><td class="num">8v8</td></tr>
+        <tr data-mark="official"><td class="en-name">Escape</td><td class="cn-name"><mark class="off">官方</mark>逃脱</td><td class="desc">EU 在限时内撤到船／车／列车；NRF 阻止。不搬包，只管跑。</td><td class="num">8v8</td></tr>
+        <tr data-mark="official"><td class="en-name">Convoy</td><td class="cn-name"><mark class="off">官方</mark>夺取（核弹）</td><td class="desc">EU 抢走微型核弹送达撤离点；NRF 阻止。开金库或开闸门会触发警报，暴露位置。</td><td class="num">8v8</td></tr>
+        <tr data-mark="literal"><td class="en-name">Cross Steal</td><td class="cn-name"><mark class="lit">直译</mark>争抢（抢发射钥匙）</td><td class="desc">夺旗式：抢到敌方发射钥匙并带回己方基地。</td><td class="num">8v8</td></tr>
+        <tr data-mark="official"><td class="en-name">Domination</td><td class="cn-name"><mark class="off">官方</mark>占领</td><td class="desc">抢占地图中央／多个据点，占领值先满者胜。</td><td class="num">8v8</td></tr>
+        <tr data-mark="official"><td class="en-name">Infection</td><td class="cn-name"><mark class="off">官方</mark>感染（僵尸）</td><td class="desc">开局随机变宿主，被咬即转化；人类撑到时间结束或全灭感染者。</td><td class="num">最多 16</td></tr>
+        <tr data-mark="official"><td class="en-name">Free For All</td><td class="cn-name"><mark class="off">官方</mark>自由打击 / 个人战</td><td class="desc">无阵营混战，各打各的，先到击杀目标者胜。</td><td class="num">最多 16</td></tr>
+        <tr data-mark="official"><td class="en-name">AI Mission</td><td class="cn-name"><mark class="off">官方</mark>AI 任务</td><td class="desc">打 AI 的 NRF。固定玩家在 EU 侧，可带或不带真人队友。</td><td class="num">固定 4 或 6</td></tr>
+        <tr data-mark="official"><td class="en-name">Riot / PRISON BREAK</td><td class="cn-name"><mark class="off">官方</mark>生存 / 越狱</td><td class="desc">4 人小队扛一波波囚犯，含防御战与逃脱战两段；每人 3 条命，耗尽即全队重来。</td><td class="num">固定 4</td></tr>
+        <tr data-mark="literal"><td class="en-name">Last Man Standing</td><td class="cn-name"><mark class="lit">直译</mark>最后生还者</td><td class="desc">大地图单人／小队吃鸡式，活到最后者胜。</td><td class="num">多人</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 二、爆破 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>二、爆破地图</h2>
+      <span class="en">Demolition</span>
+      <span class="n" data-count></span>
+    </div>
+    <p class="sec-note">全游戏数量最多的一族，也是 1337 建服时最常选到的类型。</p>
+    <table>
+      <thead><tr><th style="width:34%">英文名</th><th>中文名</th></tr></thead>
+      <tbody>
+        <tr data-mark="official"><td class="en-name">HAMMER BLOW</td><td class="cn-name"><mark class="off">官方</mark>锤击</td></tr>
+        <tr data-mark="official"><td class="en-name">DUAL SIGHT</td><td class="cn-name"><mark class="off">官方</mark>双重景象</td></tr>
+        <tr data-mark="official"><td class="en-name">FOX HUNTING</td><td class="cn-name"><mark class="off">官方</mark>猎狐</td></tr>
+        <tr data-mark="official"><td class="en-name">SHOW DOWN</td><td class="cn-name"><mark class="off">官方</mark>摊牌</td></tr>
+        <tr data-mark="official"><td class="en-name">INDIA</td><td class="cn-name"><mark class="off">官方</mark>印度</td></tr>
+        <tr data-mark="official"><td class="en-name">CANNON</td><td class="cn-name"><mark class="off">官方</mark>加农炮</td></tr>
+        <tr data-mark="official"><td class="en-name">AIRPLANE / AIRPLANE Adv.</td><td class="cn-name"><mark class="off">官方</mark>飞机场 / 飞机场·进阶</td></tr>
+        <tr data-mark="official"><td class="en-name">ASLAN</td><td class="cn-name"><mark class="off">官方</mark>阿斯兰</td></tr>
+        <tr data-mark="official"><td class="en-name">SUPPLY (RAIN)</td><td class="cn-name"><mark class="off">官方</mark>补给（雨）</td></tr>
+        <tr data-mark="official"><td class="en-name">RADAR</td><td class="cn-name"><mark class="off">官方</mark>雷达站</td></tr>
+        <tr data-mark="official"><td class="en-name">BLACK SCENT (SNOW)</td><td class="cn-name"><mark class="off">官方</mark>黑香（雪）</td></tr>
+        <tr data-mark="official"><td class="en-name">POWER PLANT / POWER PLANT-H</td><td class="cn-name"><mark class="off">官方</mark>发电厂 / 发电厂-H</td></tr>
+        <tr data-mark="official"><td class="en-name">FACTORY</td><td class="cn-name"><mark class="off">官方</mark>工厂（玩家也叫废弃工厂）</td></tr>
+        <tr data-mark="official"><td class="en-name">SLIM FOX</td><td class="cn-name"><mark class="off">官方</mark>瘦狐</td></tr>
+        <tr data-mark="official"><td class="en-name">HELL HOUND V2.0</td><td class="cn-name"><mark class="off">官方</mark>地狱犬 V2.0</td></tr>
+        <tr data-mark="literal"><td class="en-name">STACCATO</td><td class="cn-name"><mark class="lit">直译</mark>断奏</td></tr>
+        <tr data-mark="literal"><td class="en-name">SHARK</td><td class="cn-name"><mark class="lit">直译</mark>鲨鱼</td></tr>
+        <tr data-mark="literal"><td class="en-name">STONE TEMPLE</td><td class="cn-name"><mark class="lit">直译</mark>石庙</td></tr>
+        <tr data-mark="literal"><td class="en-name">AIRCRAFT CARRIER</td><td class="cn-name"><mark class="lit">直译</mark>航空母舰</td></tr>
+        <tr data-mark="literal"><td class="en-name">JUNK YARD</td><td class="cn-name"><mark class="lit">直译</mark>废料场</td></tr>
+        <tr data-mark="literal"><td class="en-name">Silo</td><td class="cn-name"><mark class="lit">直译</mark>发射井</td></tr>
+        <tr data-mark="literal"><td class="en-name">ASILE</td><td class="cn-name"><mark class="lit">直译</mark>庇护所</td></tr>
+        <tr data-mark="unknown"><td class="en-name">UNDER FAST</td><td class="cn-name"><mark class="unk">待核</mark>无中文，玩家按代号叫</td></tr>
+        <tr data-mark="literal"><td class="en-name">D-MIRAGE</td><td class="cn-name"><mark class="lit">直译</mark>D-海市蜃楼（2025 新增）</td></tr>
+        <tr data-mark="literal"><td class="en-name">JINGUASHI / IRON HIDE / BALCONY / VANGUARD</td><td class="cn-name"><mark class="lit">直译</mark>金瓜石 / 铁幕 / 阳台 / 先锋<br>（日服 ENJOY 休闲池）</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 三、歼灭 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>三、歼灭地图</h2>
+      <span class="en">Annihilation</span>
+      <span class="n" data-count></span>
+    </div>
+    <p class="sec-note">建服时看到的下拉代号多为资源名，例如 <span class="kbd">SW_Gallery</span> 其实是 <span class="kbd">GALLERY</span>（画廊）。</p>
+    <table>
+      <thead><tr><th style="width:34%">英文名</th><th>中文名</th></tr></thead>
+      <tbody>
+        <tr data-mark="official"><td class="en-name">GALLERY</td><td class="cn-name"><mark class="off">官方</mark>画廊 &nbsp;←&nbsp; 建服界面的 SW_Gallery</td></tr>
+        <tr data-mark="official"><td class="en-name">CASTLE ROCK</td><td class="cn-name"><mark class="off">官方</mark>城堡岩</td></tr>
+        <tr data-mark="official"><td class="en-name">CHROMITE</td><td class="cn-name"><mark class="off">官方</mark>铬矿</td></tr>
+        <tr data-mark="official"><td class="en-name">SNAKE EYE / SNAKE EYE (NIGHT OPS)</td><td class="cn-name"><mark class="off">官方</mark>蛇眼 / 蛇眼·夜战</td></tr>
+        <tr data-mark="official"><td class="en-name">ANACONDA</td><td class="cn-name"><mark class="off">官方</mark>巨蟒</td></tr>
+        <tr data-mark="official"><td class="en-name">STADIUM -SOCCER- / -DASH-</td><td class="cn-name"><mark class="off">官方</mark>体育场·足球 / 体育场·冲刺</td></tr>
+        <tr data-mark="official"><td class="en-name">PYRAMID</td><td class="cn-name"><mark class="off">官方</mark>金字塔</td></tr>
+        <tr data-mark="official"><td class="en-name">TOWNSHIP</td><td class="cn-name"><mark class="off">官方</mark>小镇</td></tr>
+        <tr data-mark="official"><td class="en-name">WINDMILL</td><td class="cn-name"><mark class="off">官方</mark>风车</td></tr>
+        <tr data-mark="official"><td class="en-name">BARRICADE</td><td class="cn-name"><mark class="off">官方</mark>路障</td></tr>
+        <tr data-mark="official"><td class="en-name">COLD CASE (SNOW)</td><td class="cn-name"><mark class="off">官方</mark>冷案（雪）</td></tr>
+        <tr data-mark="official"><td class="en-name">SHILIN MARKET</td><td class="cn-name"><mark class="off">官方</mark>士林夜市</td></tr>
+        <tr data-mark="official"><td class="en-name">DOCK</td><td class="cn-name"><mark class="off">官方</mark>码头</td></tr>
+        <tr data-mark="official"><td class="en-name">PORT</td><td class="cn-name"><mark class="off">官方</mark>港口</td></tr>
+        <tr data-mark="official"><td class="en-name">MUSEUM</td><td class="cn-name"><mark class="off">官方</mark>博物馆</td></tr>
+        <tr data-mark="official"><td class="en-name">BLIND EAGLE</td><td class="cn-name"><mark class="off">官方</mark>盲鹰</td></tr>
+        <tr data-mark="literal"><td class="en-name">SHALI</td><td class="cn-name"><mark class="lit">直译</mark>夏里（音译，各服叫法不统一）</td></tr>
+        <tr data-mark="official"><td class="en-name">Frozen Factory（英文待核）</td><td class="cn-name"><mark class="off">官方</mark>冰冻工厂<br><span class="desc">新手首选竞技图；中文名确定，英文官方写法未核实</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 四、护送 / 突破 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>四、护送 · 突破地图</h2>
+      <span class="en">Escort / Breach</span>
+      <span class="n" data-count></span>
+    </div>
+    <p class="sec-note">两个模式共用同一批图，只是叫法不同。</p>
+    <table>
+      <thead><tr><th style="width:34%">英文名</th><th>中文名</th></tr></thead>
+      <tbody>
+        <tr data-mark="official"><td class="en-name">STORM BLITZ / STORM BLITZ (NIGHT OPS)</td><td class="cn-name"><mark class="off">官方</mark>风暴突袭 / 风暴突袭·夜战</td></tr>
+        <tr data-mark="official"><td class="en-name">RISING DUST / RISING DUST (NIGHT OPS)</td><td class="cn-name"><mark class="off">官方</mark>扬尘 / 扬尘·夜战</td></tr>
+        <tr data-mark="official"><td class="en-name">BURNING TEMPLE</td><td class="cn-name"><mark class="off">官方</mark>燃烧神殿</td></tr>
+        <tr data-mark="official"><td class="en-name">SCORPION</td><td class="cn-name"><mark class="off">官方</mark>蝎子</td></tr>
+        <tr data-mark="official"><td class="en-name">BLACKHAWK</td><td class="cn-name"><mark class="off">官方</mark>黑鹰</td></tr>
+        <tr data-mark="literal"><td class="en-name">WHITE OUT</td><td class="cn-name"><mark class="lit">直译</mark>雪盲</td></tr>
+        <tr data-mark="official"><td class="en-name">CASABLANCA</td><td class="cn-name"><mark class="off">官方</mark>卡萨布兰卡</td></tr>
+        <tr data-mark="official"><td class="en-name">FURY</td><td class="cn-name"><mark class="off">官方</mark>狂怒</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 五、夺取 / 争抢 / 占领 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>五、夺取 · 争抢 · 占领地图</h2>
+      <span class="en">Convoy / Cross Steal / Domination</span>
+      <span class="n" data-count></span>
+    </div>
+    <table>
+      <thead><tr><th style="width:20%">所属模式</th><th style="width:34%">英文名</th><th>中文名</th></tr></thead>
+      <tbody>
+        <tr data-mark="official"><td class="desc">夺取 Convoy</td><td class="en-name">BREAK OUT / BREAK OUT (NIGHT OPS)</td><td class="cn-name"><mark class="off">官方</mark>突围 / 突围·夜战</td></tr>
+        <tr data-mark="official"><td class="desc">夺取 Convoy</td><td class="en-name">RUNAWAY</td><td class="cn-name"><mark class="off">官方</mark>逃亡</td></tr>
+        <tr data-mark="literal"><td class="desc">夺取 Convoy</td><td class="en-name">SKUA</td><td class="cn-name"><mark class="lit">直译</mark>贼鸥</td></tr>
+        <tr data-mark="literal"><td class="desc">争抢 Cross Steal</td><td class="en-name">CONVEYOR</td><td class="cn-name"><mark class="lit">直译</mark>传送带</td></tr>
+        <tr data-mark="official"><td class="desc">争抢 Cross Steal</td><td class="en-name">BLIND EAGLE</td><td class="cn-name"><mark class="off">官方</mark>盲鹰（与歼灭通用）</td></tr>
+        <tr data-mark="official"><td class="desc">占领 Domination</td><td class="en-name">BLAZING FORT</td><td class="cn-name"><mark class="off">官方</mark>烈焰堡垒</td></tr>
+        <tr data-mark="official"><td class="desc">占领 Domination</td><td class="en-name">CASTLE</td><td class="cn-name"><mark class="off">官方</mark>城堡</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 六、逃脱 / 感染 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>六、逃脱 · 感染地图</h2>
+      <span class="en">Escape / Infection</span>
+      <span class="n" data-count></span>
+    </div>
+    <p class="sec-note">感染模式的图都是从其他模式挪用的，没有专属感染图。</p>
+    <table>
+      <thead><tr><th style="width:20%">所属模式</th><th style="width:34%">英文名</th><th>中文名</th></tr></thead>
+      <tbody>
+        <tr data-mark="official"><td class="desc">逃脱</td><td class="en-name">E-BOAT / E-BOAT Night</td><td class="cn-name"><mark class="off">官方</mark>逃生船 / 逃生船·夜</td></tr>
+        <tr data-mark="official"><td class="desc">逃脱</td><td class="en-name">E-SPACE</td><td class="cn-name"><mark class="off">官方</mark>逃生车</td></tr>
+        <tr data-mark="official"><td class="desc">逃脱</td><td class="en-name">E-TRAIN</td><td class="cn-name"><mark class="off">官方</mark>逃生列车</td></tr>
+        <tr data-mark="official"><td class="desc">感染</td><td class="en-name">BURNING TEMPLE</td><td class="cn-name"><mark class="off">官方</mark>燃烧神殿</td></tr>
+        <tr data-mark="official"><td class="desc">感染</td><td class="en-name">PRISON BREAK</td><td class="cn-name"><mark class="off">官方</mark>越狱</td></tr>
+        <tr data-mark="official"><td class="desc">感染</td><td class="en-name">DUAL SIGHT</td><td class="cn-name"><mark class="off">官方</mark>双重景象</td></tr>
+        <tr data-mark="official"><td class="desc">感染</td><td class="en-name">DARK CHAMBER</td><td class="cn-name"><mark class="off">官方</mark>暗室</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 七、合作 / AI / 镇压 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>七、合作 · AI · 镇压地图</h2>
+      <span class="en">CO-OP / AI Mission</span>
+      <span class="n" data-count></span>
+    </div>
+    <p class="sec-note">全部是 PvE。1337 建服界面里的 <span class="kbd">Train, Death Valley</span> 就属于这一族。</p>
+    <table>
+      <thead><tr><th style="width:20%">类型</th><th style="width:34%">英文名</th><th>中文名</th></tr></thead>
+      <tbody>
+        <tr data-mark="official"><td class="desc">合作</td><td class="en-name">PRISON BREAK -SURVIVAL-</td><td class="cn-name"><mark class="off">官方</mark>越狱·生存</td></tr>
+        <tr data-mark="official"><td class="desc">合作</td><td class="en-name">PRISON BREAK -ESCAPE-</td><td class="cn-name"><mark class="off">官方</mark>越狱·逃脱</td></tr>
+        <tr data-mark="official"><td class="desc">合作</td><td class="en-name">PRISON BREAK 2 -RESCUE-</td><td class="cn-name"><mark class="off">官方</mark>越狱2·营救</td></tr>
+        <tr data-mark="official"><td class="desc">合作</td><td class="en-name">BATTLE GEAR -BEGINZ-</td><td class="cn-name"><mark class="off">官方</mark>战斗装备·开端</td></tr>
+        <tr data-mark="official"><td class="desc">合作</td><td class="en-name">AVA Train</td><td class="cn-name"><mark class="off">官方</mark>列车</td></tr>
+        <tr data-mark="literal"><td class="desc">合作</td><td class="en-name">OVER RIDER</td><td class="cn-name"><mark class="lit">直译</mark>超越者</td></tr>
+        <tr data-mark="official"><td class="desc">合作</td><td class="en-name">DEATH VALLEY / DEATH VALLEY V2.0</td><td class="cn-name"><mark class="off">官方</mark>死亡谷 / 死亡谷 V2.0</td></tr>
+        <tr data-mark="official"><td class="desc">合作</td><td class="en-name">LOCK DOWN / LOCK DOWN PLUS / LOCK DOWN E</td><td class="cn-name"><mark class="off">官方</mark>封锁 / 封锁+ / 封锁E</td></tr>
+        <tr data-mark="literal"><td class="desc">合作</td><td class="en-name">DARK ZONE</td><td class="cn-name"><mark class="lit">直译</mark>暗区</td></tr>
+        <tr data-mark="official"><td class="desc">AI 爆破</td><td class="en-name">AI-CANNON / AI-SUPPLY / AI-AIRPLANE / AI-ASLAN</td><td class="cn-name"><mark class="off">官方</mark>AI·加农炮 / 补给 / 飞机场 / 阿斯兰</td></tr>
+        <tr data-mark="official"><td class="desc">镇压</td><td class="en-name">AI-CASTLE ROCK / AI-CHROMITE / AI-WINDMILL</td><td class="cn-name"><mark class="off">官方</mark>AI·城堡岩 / 铬矿 / 风车</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 八、其他 ===== -->
+  <section data-sec>
+    <div class="sec-head">
+      <h2>八、其他 · 特殊地图</h2>
+      <span class="en">Misc</span>
+      <span class="n" data-count></span>
+    </div>
+    <table>
+      <thead><tr><th style="width:20%">类型</th><th style="width:34%">英文名</th><th>中文名</th></tr></thead>
+      <tbody>
+        <tr data-mark="official"><td class="desc">全灭</td><td class="en-name">MOSQUE</td><td class="cn-name"><mark class="off">官方</mark>清真寺<br><span class="desc">开局地上摆 10 把主武器任挑，7 局先取，禁止自带装备</span></td></tr>
+        <tr data-mark="literal"><td class="desc">侵入</td><td class="en-name">FALCON</td><td class="cn-name"><mark class="lit">直译</mark>猎鹰</td></tr>
+        <tr data-mark="literal"><td class="desc">其他</td><td class="en-name">Island</td><td class="cn-name"><mark class="lit">直译</mark>孤岛</td></tr>
+        <tr data-mark="official"><td class="desc">特殊</td><td class="en-name">（台服 2026-04 新增）</td><td class="cn-name"><mark class="off">官方</mark>绝命玻璃桥<br><span class="desc">跳跃玩法：两块玻璃平台二选一，选错即掉落；人数越多桥越多</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="callout">
+    <div class="t">关于你卡住的那张图</div>
+    <p><span class="kbd">SW_Gallery</span> 就是 <span class="kbd">GALLERY</span>（画廊），一张<b>歼灭图</b>。建服界面显示资源代号而不是官方名，属正常现象。</p>
+    <p>这意味着你当时选的是歼灭模式 + 画廊地图，控制台反复刷同一组 <span class="kbd">Spawn Pos</span> 坐标，就是出生点没被正确分配 —— 先换一张图、把双方人数调平，再试 <span class="kbd">Initialize Game</span>。</p>
+  </div>
+
+  <!-- ===== 自查：本机地图清单 ===== -->
+  <section data-sec style="margin-top:42px">
+    <div class="sec-head">
+      <h2>九、查你这台机器到底有哪些图</h2>
+      <span class="en">Local Map Inventory</span>
+    </div>
+    <p class="sec-note">在 Windows 命令行（cmd）里跑，把实际文件名抓出来，再对照上表认领官方名。</p>
+    <div class="cmd">
+      <button onclick="copyCmd(this)">复制</button>
+<pre><span class="cmt">:: 列出整合包里所有地图资源文件</span>
+dir /b /s "D:\ava1\ava\AVAGame\Maps\*.upk"
+
+<span class="cmt">:: 若路径不同，先找游戏根目录</span>
+where /r D:\ AVA.exe
+dir /b /s "D:\ava1\ava\*.upk" | findstr /i "map"</pre>
+    </div>
+    <p class="sec-note" style="margin-top:12px">把输出贴回来，我按上表逐条标注「英文名 + 中文名 + 所属模式」，单独给你一份<b>只属于你这套整合包</b>的地图索引。</p>
+  </section>
+
+  <footer>
+    <h2>资料来源</h2>
+    <ul>
+      <li>日服 WIKIWIKI《Alliance of Valiant Arms Wiki》地图全集（含已废止清单）— <a href="https://wikiwiki.jp/allian/%E3%83%9E%E3%83%83%E3%83%97" target="_blank" rel="noopener">wikiwiki.jp/allian/マップ</a></li>
+      <li>UAVA Wiki 按模式分类地图页 — <a href="https://uava.fandom.com/wiki/Maps_of_AVA" target="_blank" rel="noopener">uava.fandom.com/wiki/Maps_of_AVA</a></li>
+      <li>AVA Global 模式与地图数量说明 — <a href="https://quoramarketing.com/alliance-of-valiant-arms-global-all-modes-explained/" target="_blank" rel="noopener">quoramarketing.com</a></li>
+      <li>Giant Bomb 条目（爆破 14 图、模式沿革）— <a href="https://giantbomb.com/wiki/index.php?title=Games/Alliance_of_Valiant_Arms" target="_blank" rel="noopener">giantbomb.com</a></li>
+      <li>台服《A.V.A 战地之王》2026-04-16 改版公告（绝命玻璃桥、巨石碉堡、药命效应 Adv）— <a href="https://ava.mangot5.com/game/ava/notice/detail/?contentNo=67781" target="_blank" rel="noopener">ava.mangot5.com</a></li>
+      <li>日服 2025-02-26 改版公告（新图 D-Mirage）— <a href="https://ava.pmang.jp/new_notices/10773" target="_blank" rel="noopener">ava.pmang.jp</a></li>
+      <li>国服「冰冻工厂」地图攻略与平面图 — 962.net 相关攻略页</li>
+      <li>国服「风暴突袭」护送攻略 — doc88 相关文档</li>
+    </ul>
+    <p class="foot-note">本页为离线单文件，无外部字体与脚本依赖，断网可直接双击打开；Ctrl+P 可打印成 PDF 存档。标注「直译／待核」的中文名不是官方译名，引用时请注意。</p>
+  </footer>
+
+  <div class="empty" id="empty">没有匹配的条目，换个关键词试试。</div>
+</div>
+
+<script>
+(function(){
+  var q = document.getElementById('q');
+  var onlyOff = document.getElementById('onlyOff');
+  var countEl = document.getElementById('count');
+  var emptyEl = document.getElementById('empty');
+  var secs = Array.prototype.slice.call(document.querySelectorAll('[data-sec]'));
+  var allRows = [];
+
+  secs.forEach(function(sec){
+    var rows = Array.prototype.slice.call(sec.querySelectorAll('tbody tr'));
+    rows.forEach(function(tr){
+      tr.__text = (tr.textContent || '').toLowerCase().replace(/\s+/g,' ');
+      tr.__mark = tr.getAttribute('data-mark') || '';
+    });
+    var holder = sec.querySelector('[data-count]');
+    sec.__rows = rows;
+    sec.__holder = holder;
+    allRows = allRows.concat(rows);
+  });
+
+  function apply(){
+    var term = (q.value || '').trim().toLowerCase();
+    var onlyOf = onlyOff.checked;
+    var visible = 0;
+
+    secs.forEach(function(sec){
+      var shown = 0;
+      sec.__rows.forEach(function(tr){
+        var ok = true;
+        if (term && tr.__text.indexOf(term) === -1) ok = false;
+        if (ok && onlyOf && tr.__mark !== 'official') ok = false;
+        tr.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      });
+      sec.style.display = shown ? '' : 'none';
+      if (sec.__holder) sec.__holder.textContent = shown + ' 条';
+      visible += shown;
+    });
+
+    countEl.textContent = visible + ' / ' + allRows.length + ' 条';
+    emptyEl.style.display = visible ? 'none' : 'block';
+  }
+
+  q.addEventListener('input', apply);
+  onlyOff.addEventListener('change', apply);
+  apply();
+
+  window.copyCmd = function(btn){
+    var pre = btn.parentNode.querySelector('pre');
+    var txt = pre.textContent;
+    var done = function(){ btn.textContent = '已复制'; setTimeout(function(){ btn.textContent = '复制'; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function(){ fallback(txt, done); });
+    } else { fallback(txt, done); }
+  };
+
+  function fallback(txt, done){
+    var ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch(e){}
+    document.body.removeChild(ta);
+  }
+})();
+</script>
+</body>
+</html>
